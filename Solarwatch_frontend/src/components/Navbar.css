@@ -1,0 +1,30 @@
+/* Navbar container stílusok */
+.navbar {
+    width: 100%;
+    background-color: #4CAF50; /* Eredeti zöldes szín */
+    color: white;
+    display: flex;
+    justify-content: flex-start; /* Balra igazított tartalom */
+    align-items: center;
+    padding: 0 2rem; /* Kicsit csökkentjük a paddinget, hogy jobban elférjen */
+    position: fixed; /* Fix pozíció a tetején */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Biztosítsd, hogy a navbar minden más tartalom fölött legyen */
+}
+
+/* Link stílusok */
+.navbar a {
+    text-decoration: none; /* Aláhúzás eltávolítása */
+    color: white; /* Szöveg színe */
+    font-size: 1rem; /* Betűméret */
+    padding: 1rem 1.5rem; /* Belső tér a link körül */
+    margin-right: 1rem; /* Jobbra kis tér a linkek között */
+    transition: all 0.3s ease; /* Sima átmenet */
+}
+
+/* Link hover állapot */
+.navbar a:hover {
+    background-color: #333; /* Háttérszín változása hover állapotban */
+    color: white; /* Szöveg színe hover állapotban */
+}
