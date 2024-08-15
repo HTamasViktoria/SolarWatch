@@ -28,7 +28,7 @@ namespace SolarWatch.Controllers
 
         }
         
-       
+       //sunrisesunsetből kiindulva
         [HttpGet("{cityName}/{date}", Name = "GetSolarData")]
         public async Task<ActionResult<SunData>> GetSolarData(string cityName, string date)
         {

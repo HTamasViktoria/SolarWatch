@@ -16,10 +16,10 @@ public partial class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        ConfigureServices(builder.Services);
+        ConfigureServices(builder.Services, builder.Configuration);
         ConfigureSwagger(builder.Services);
-        ConfigureAuthentication(builder.Services);
-        ConfigureDatabaseContexts(builder.Services);
+        ConfigureAuthentication(builder.Services, builder.Configuration);
+        ConfigureDatabaseContexts(builder.Services, builder.Configuration);
         ConfigureCustomServices(builder.Services);
         ConfigureIdentity(builder.Services);
 
@@ -30,12 +30,10 @@ public partial class Program
         authenticationSeeder.AddAdmin();
         ConfigureMiddleware(app);
         
-        
-        
         app.Run();
     }
 
-    private static void ConfigureServices(IServiceCollection services)
+    private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
         services.AddEndpointsApiExplorer();
@@ -72,8 +70,13 @@ public partial class Program
         });
     }
 
-    private static void ConfigureAuthentication(IServiceCollection services)
+    private static void ConfigureAuthentication(IServiceCollection services, IConfiguration configuration)
     {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var key = jwtSettings["IssuerSigningKey"];
+        var issuer = jwtSettings["ValidIssuer"];
+        var audience = jwtSettings["ValidAudience"];
+
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -85,25 +88,24 @@ public partial class Program
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "apiWithAuthBackend",
-                    ValidAudience = "apiWithAuthBackend",
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes("!SomethingSecret!!SomethingSecret!")
-                    ),
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                 };
             });
     }
 
-    private static void ConfigureDatabaseContexts(IServiceCollection services)
+    private static void ConfigureDatabaseContexts(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<SolarWatchApiContext>(  options =>
+        var connectionString = configuration.GetConnectionString("MSSQL_CONNECTION");
+        
+        services.AddDbContext<SolarWatchApiContext>(options =>
         {
-            options.UseSqlServer("Server=localhost,1433;Database=SolarWatchDB;User Id=sa;Password=HateYou123;Encrypt=false;");
-        });;
-        services.AddDbContext<UsersContext>( options=>
+            options.UseSqlServer(connectionString);
+        });
+        services.AddDbContext<UsersContext>(options =>
         {
-            options.UseSqlServer(
-                "Server=localhost,1433;Database=SolarWatchDB;User Id=sa;Password=HateYou123;Encrypt=false;");
+            options.UseSqlServer(connectionString);
         });
     }
 
